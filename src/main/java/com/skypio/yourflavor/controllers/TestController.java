@@ -2,11 +2,8 @@ package com.skypio.yourflavor.controllers;
 
 import com.skypio.yourflavor.entity.Test;
 import com.skypio.yourflavor.repository.TestRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.Encoder;
 import java.security.Principal;
 import java.util.List;
 
