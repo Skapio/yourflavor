@@ -1,6 +1,9 @@
 package com.skypio.yourflavor.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -19,6 +22,7 @@ public class AppFoodCollection {
     private String dishName;
     @Column(name = "cuisine_type")
     private String cuisineType;
+    @Column(columnDefinition = "TEXT")
     private String recipe;
     @Column(name = "photo_path")
     private String photoPath;

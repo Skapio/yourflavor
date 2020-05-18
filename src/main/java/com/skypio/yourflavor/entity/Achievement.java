@@ -1,6 +1,9 @@
 package com.skypio.yourflavor.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -16,6 +19,8 @@ public class Achievement {
     private Integer achievementId;
 
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
 }
