@@ -88,8 +88,7 @@ public class FileStorageService {
 
     private void createDirectories(String path)
     {
-        Path location = Paths.get(fileStorageProperties.getUploadDir() + "/" + path)
-                .toAbsolutePath().normalize();
+        Path location = Paths.get(path).toAbsolutePath().normalize();
 
         try {
             Files.createDirectories(location);
