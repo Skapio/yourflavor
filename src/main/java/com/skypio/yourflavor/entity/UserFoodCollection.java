@@ -1,7 +1,9 @@
 package com.skypio.yourflavor.entity;
 
-import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -25,8 +27,6 @@ public class UserFoodCollection {
     private String restaurantAddress;
     private Date date;
     private Integer rate;
-    @Column(name = "photo_path")
-    private String photoPath;
 
     @Column(name = "user_id")
     private Integer userId;

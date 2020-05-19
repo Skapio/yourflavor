@@ -24,6 +24,4 @@ public class AppFoodCollection {
     private String cuisineType;
     @Column(columnDefinition = "TEXT")
     private String recipe;
-    @Column(name = "photo_path")
-    private String photoPath;
 }

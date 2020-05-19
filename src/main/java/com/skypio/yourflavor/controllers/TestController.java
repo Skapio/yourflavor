@@ -11,10 +11,11 @@ import java.security.Principal;
 public class TestController {
 
 
+
     @GetMapping("/getinformations")
     public String getAllByUserId(Principal principal)
     {
-        // List<Test> tests = testRepository.findByUserId(principal.getName());
+          // List<Test> tests = testRepository.findByUserId(principal.getName());
 
         return "test";
     }
