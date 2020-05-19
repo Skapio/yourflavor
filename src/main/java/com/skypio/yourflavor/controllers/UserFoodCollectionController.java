@@ -18,9 +18,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usr-coll")
@@ -98,7 +100,7 @@ public class UserFoodCollectionController {
                 .body(resource);
     }
 
-    @PostMapping("/photo/{userFoodCollectionId}/")
+    @PostMapping("/photo/{userFoodCollectionId}")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @PathVariable("userFoodCollectionId") Integer userFoodCollectionId) {
         String fileName = fileStorageService.storeFile(file, BASE_PATH + "/" + userFoodCollectionId);
 
@@ -113,4 +115,10 @@ public class UserFoodCollectionController {
                 file.getContentType(), file.getSize());
     }
 
+    @PostMapping("/photos/{userFoodCollectionId}")
+    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files, @PathVariable("userFoodCollectionId") Integer userFoodCollectionId) {
+        return Arrays.stream(files)
+                .map(file -> uploadFile(file, userFoodCollectionId))
+                .collect(Collectors.toList());
+    }
 }
