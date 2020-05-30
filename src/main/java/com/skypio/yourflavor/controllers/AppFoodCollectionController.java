@@ -1,6 +1,6 @@
 package com.skypio.yourflavor.controllers;
 
-import com.skypio.yourflavor.entity.AppFoodCollection;
+import com.skypio.yourflavor.dto.response.AppFoodCollectionResponse;
 import com.skypio.yourflavor.repository.AppFoodCollectionRepository;
 import com.skypio.yourflavor.service.FileStorageService;
 import org.springframework.core.io.Resource;
@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/app")
@@ -27,28 +28,30 @@ public class AppFoodCollectionController {
 
     private AppFoodCollectionRepository appFoodCollectionRepository;
 
-    public AppFoodCollectionController(AppFoodCollectionRepository appFoodCollectionRepository, FileStorageService fileStorageService)
-    {
+    public AppFoodCollectionController(AppFoodCollectionRepository appFoodCollectionRepository, FileStorageService fileStorageService) {
         this.appFoodCollectionRepository = appFoodCollectionRepository;
         this.fileStorageService = fileStorageService;
     }
 
     @GetMapping("/test2")
-    public List<AppFoodCollection> getAllFromAppCollection()
-    {
-        List<AppFoodCollection> aCollections = appFoodCollectionRepository.findAll();
+    public List<AppFoodCollectionResponse> getAllFromAppCollection() {
+        return appFoodCollectionRepository
+                .findAll()
+                .stream()
+                .map(appFoodCollection -> {
+                    Set<String> photos = this.getPhotos(appFoodCollection.getAppFoodCollectionId());
 
-        return aCollections;
+                    return AppFoodCollectionResponse.fromAppFoodCollection(appFoodCollection, photos);
+                }).collect(Collectors.toList());
     }
 
     @GetMapping("/photo/{appFoodCollectionId}")
-    public Set<String> getPhotos(@PathVariable("appFoodCollectionId") Integer appFoodCollectionId)
-    {
+    public Set<String> getPhotos(@PathVariable("appFoodCollectionId") Integer appFoodCollectionId) {
         return fileStorageService.getFiles(BASE_PATH + "/" + appFoodCollectionId);
     }
 
     @GetMapping("/photo/{appFoodCollectionId}/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName,@PathVariable("appFoodCollectionId") Integer appFoodCollectionId, HttpServletRequest request) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, @PathVariable("appFoodCollectionId") Integer appFoodCollectionId, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = fileStorageService.loadFileAsResource(fileName, BASE_PATH + "/" + appFoodCollectionId);
 
@@ -61,7 +64,7 @@ public class AppFoodCollectionController {
         }
 
         // Fallback to the default content type if type could not be determined
-        if(contentType == null) {
+        if (contentType == null) {
             contentType = "application/octet-stream";
         }
 
