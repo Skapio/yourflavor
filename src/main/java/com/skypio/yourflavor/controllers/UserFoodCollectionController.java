@@ -1,7 +1,9 @@
 package com.skypio.yourflavor.controllers;
 
 import com.skypio.yourflavor.dto.request.AddUserFoodCollectionRequest;
+import com.skypio.yourflavor.dto.request.UpdateUserFoodCollectionRequest;
 import com.skypio.yourflavor.dto.response.UploadFileResponse;
+import com.skypio.yourflavor.dto.response.UserFoodCollectionResponse;
 import com.skypio.yourflavor.entity.UserFoodCollection;
 import com.skypio.yourflavor.repository.UserFoodCollectionRepository;
 import com.skypio.yourflavor.security.MyUserDetails;
@@ -18,10 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,14 +40,16 @@ public class UserFoodCollectionController {
     }
 
     @GetMapping("/list")
-    public List<UserFoodCollection> getAllUserFoodCollection(Principal principal)
+    public List<UserFoodCollectionResponse> getAllUserFoodCollection()
     {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) principal;
-        MyUserDetails myUserDetails = (MyUserDetails) usernamePasswordAuthenticationToken.getPrincipal();
+        return userFoodCollectionRepository
+                .findAll()
+                .stream()
+                .map(userFoodCollection -> {
+                    Set<String> photos = this.getPhotos(userFoodCollection.getUserFoodCollectionId());
 
-        List<UserFoodCollection> uCollections = userFoodCollectionRepository.findByUserId(myUserDetails.getUserId());
-
-        return uCollections;
+                    return UserFoodCollectionResponse.fromUserFoodCollection(userFoodCollection, photos);
+                }).collect(Collectors.toList());
     }
 
     @PostMapping("/test2")
@@ -68,6 +69,28 @@ public class UserFoodCollectionController {
         userFoodCollection.setUserId(myUserDetails.getUserId());
 
         return userFoodCollectionRepository.save(userFoodCollection);
+    }
+
+    @PostMapping("/update/{id}")
+    public UserFoodCollection updateUserFoodCollection(Principal principal, @RequestBody UpdateUserFoodCollectionRequest updateUserFoodCollectionRequest, @PathVariable Integer id)
+    {
+
+        Optional<UserFoodCollection> optionalUserFoodCollection = userFoodCollectionRepository.findById(id);
+
+        if (optionalUserFoodCollection.isPresent()) {
+            UserFoodCollection userFoodCollection = optionalUserFoodCollection.get();
+
+            userFoodCollection.setCountry(updateUserFoodCollectionRequest.getCountry());
+            userFoodCollection.setCity(updateUserFoodCollectionRequest.getCity());
+            userFoodCollection.setRestaurantName(updateUserFoodCollectionRequest.getRestaurantName());
+            userFoodCollection.setRestaurantAddress(updateUserFoodCollectionRequest.getRestaurantAddress());
+            userFoodCollection.setRate(updateUserFoodCollectionRequest.getRate());
+            userFoodCollection.setAppFoodCollectionId(updateUserFoodCollectionRequest.getAppFoodCollectionId());
+
+            return userFoodCollectionRepository.save(userFoodCollection);
+        } else {
+            throw  new RuntimeException("Collection not found for the id "+id);
+        }
     }
 
     @GetMapping("/photo/{userFoodCollectionId}")
@@ -121,4 +144,19 @@ public class UserFoodCollectionController {
                 .map(file -> uploadFile(file, userFoodCollectionId))
                 .collect(Collectors.toList());
     }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteUserFoodCollection(@PathVariable Integer id) {
+        Optional<UserFoodCollection> userFoodCollection = userFoodCollectionRepository.findById(id);
+        if (userFoodCollection.isPresent())
+        {
+            userFoodCollectionRepository.delete(userFoodCollection.get());
+            return "Collection is deleted with id "+id;
+        }
+        else
+        {
+            throw  new RuntimeException("Collection not found for the id "+id);
+        }
+    }
+
 }
