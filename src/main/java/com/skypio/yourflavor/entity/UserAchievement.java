@@ -1,6 +1,9 @@
 package com.skypio.yourflavor.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,9 +19,8 @@ public class UserAchievement {
     @Column(name = "user_achievement_id")
     private Integer userAchievementId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "achievement_id")
-    private Achievement achievement;
+    @Column(name = "achievement_id")
+    private Integer achievementId;
 
     @Column(name = "user_id")
     private Integer userId;
