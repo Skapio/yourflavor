@@ -1,6 +1,9 @@
 package com.skypio.yourflavor.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -23,5 +26,5 @@ public class User {
     @ManyToMany()
     @JoinTable(name = "user_favorite_collection", joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "app_food_collection_id"))
-    private Set<AppFoodCollection> appFoods;
+    private Set<AppFoodCollection> favoriteAppFoodCollection;
 }
