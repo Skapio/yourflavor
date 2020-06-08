@@ -4,12 +4,11 @@ import com.skypio.yourflavor.dto.request.AddUserFoodCollectionRequest;
 import com.skypio.yourflavor.dto.request.UpdateUserFoodCollectionRequest;
 import com.skypio.yourflavor.dto.response.UploadFileResponse;
 import com.skypio.yourflavor.dto.response.UserFoodCollectionResponse;
-import com.skypio.yourflavor.entity.User;
 import com.skypio.yourflavor.entity.UserFoodCollection;
 import com.skypio.yourflavor.repository.UserFoodCollectionRepository;
-import com.skypio.yourflavor.repository.UserRepository;
 import com.skypio.yourflavor.security.MyUserDetails;
 import com.skypio.yourflavor.service.FileStorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,13 +33,14 @@ public class UserFoodCollectionController {
     private FileStorageService fileStorageService;
 
     private UserFoodCollectionRepository userFoodCollectionRepository;
-    private UserRepository userRepository;
 
-    public UserFoodCollectionController(UserFoodCollectionRepository userFoodCollectionRepository, FileStorageService fileStorageService, UserRepository userRepository)
+    private UserFoodCollection userFoodCollection;
+
+    @Autowired
+    public UserFoodCollectionController(UserFoodCollectionRepository userFoodCollectionRepository, FileStorageService fileStorageService)
     {
         this.userFoodCollectionRepository = userFoodCollectionRepository;
         this.fileStorageService = fileStorageService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/list")
@@ -49,23 +49,15 @@ public class UserFoodCollectionController {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) principal;
         MyUserDetails myUserDetails = (MyUserDetails) usernamePasswordAuthenticationToken.getPrincipal();
 
-        Optional<User> optionalUser = userRepository.findById(myUserDetails.getUserId());
-
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
 
             return userFoodCollectionRepository
-                    .findAll()
+                    .findByUserId(myUserDetails.getUserId())
                     .stream()
                     .map(userFoodCollection -> {
                         Set<String> photos = this.getPhotos(userFoodCollection.getUserFoodCollectionId());
 
                         return UserFoodCollectionResponse.fromUserFoodCollection(userFoodCollection, photos);
                     }).collect(Collectors.toList());
-        } else {
-            throw  new RuntimeException("User not exists");
-        }
     }
 
     @PostMapping("/test2")
