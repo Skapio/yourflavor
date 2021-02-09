@@ -30,6 +30,7 @@ public class FileStorageService {
 
     public String storeFile(MultipartFile file, String path) {
         // Normalize file name
+
         String targetDirectory = fileStorageProperties.getUploadDir() + "/" + path;
         createDirectories(targetDirectory);
 
